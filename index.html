@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Raiku Quiz</title>
+<style>
+body {
+    margin: 0;
+    font-family: 'Inter', sans-serif;
+    background: url('background.jpg') no-repeat center center fixed;
+    background-size: cover;
+    color: #fff;
+}
+.container {
+    max-width: 900px;
+    margin: 50px auto;
+    padding: 30px;
+    background: rgba(0,0,0,0.75);
+    border-radius: 15px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.5);
+    overflow-y: auto;
+    max-height: 90vh;
+}
+h1 {
+    text-align: center;
+    margin-bottom: 30px;
+    font-size: 2.2rem;
+    color: #00ffcc;
+}
+.question {
+    margin-bottom: 25px;
+    padding: 15px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 10px;
+}
+.question p {
+    margin-bottom: 12px;
+    font-size: 1.1rem;
+}
+.options button {
+    display: block;
+    width: 100%;
+    margin: 5px 0;
+    padding: 10px 12px;
+    font-size: 16px;
+    color: #fff;
+    background: rgba(255,255,255,0.1);
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.3s;
+    text-align: left;
+}
+.options button:hover {
+    background: rgba(0,255,255,0.2);
+}
+.options button.selected { background: rgba(0,255,255,0.4); color: #000; }
+.options button.correct { background: rgba(0,255,0,0.5); color: #000; }
+.options button.wrong { background: rgba(255,0,0,0.5); color: #000; }
+.submit-btn {
+    display: block;
+    margin: 20px auto;
+    padding: 12px 30px;
+    font-size: 18px;
+    background: #00ffcc;
+    color: #000;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+.submit-btn:hover { background: #00d6b8; }
+</style>
+</head>
+<body>
+<div class="container">
+    <h1>Raiku Quiz</h1>
+    <div id="quiz"></div>
+    <button class="submit-btn" id="submitBtn">Submit Quiz</button>
+</div>
+
+<script>
+// Quiz Data
+const quizData = [
+  { question: "Q1. What is Raiku’s role relative to Solana?", options: ["Independent blockchain","Coordination / extension layer","Layer-2 rollup","Decentralized storage"], answer: 2 },
+  { question: "Q2. Which is not a new transaction primitive of Raiku?", options: ["Guaranteed execution","Ahead-of-time inclusion","Data / proof streaming","Off-chain fallback settlement"], answer: 4 },
+  { question: "Q3. How does Raiku aim to mitigate MEV risks?", options: ["Private mempools","Eliminating private mempools","Order flow bans","Oracle-based ordering"], answer: 2 },
+  { question: "Q4. Which design avoids liquidity fragmentation on Solana?", options: ["Side chains","Separate bridges","Direct settlement on Solana L1","Cross-chain messaging"], answer: 3 },
+  { question: "Q5. What does “decoupling execution and consensus” enable?", options: ["Offchain consensus","Independent execution environments","No validators","Proof-of-work consensus"], answer: 2 },
+  { question: "Q6. Raiku introduces “off-chain, edge compute” modules. What is a claimed advantage of this approach?", options: ["Execution is completely separated from Solana and never interacts","Faster finality, isolation of faults, and concurrent execution of vote and user logic","No need for validators","Users must stake to access compute"], answer: 2 },
+  { question: "Q7. How does Raiku plan to scale throughput?", options: ["Single leader slots","Rollups","Multiple Concurrent Leaders (MCL)","Delegated staking"], answer: 3 },
+  { question: "Q8. Why introduce a blockspace marketplace?", options: ["Reserve inclusion ahead of time","Validator-only inclusion","Random ordering","No fees"], answer: 1 },
+  { question: "Q9. Which Solana proposal aligns validator incentives?", options: ["Fee burn","SIMD-0096: 100% fees to validators","Fee removal","Proof of work"], answer: 2 },
+  { question: "Q10. Which use case benefits most from Raiku?", options: ["Low-frequency transfers","High-frequency trading & real-time apps","Simple swaps","Batch settlement"], answer: 2 }
+];
+
+// Render Quiz
+const quizContainer = document.getElementById('quiz');
+quizData.forEach((q, idx) => {
+    const qDiv = document.createElement('div');
+    qDiv.classList.add('question');
+    qDiv.innerHTML = `<p>${q.question}</p>`;
+    
+    const optsDiv = document.createElement('div');
+    optsDiv.classList.add('options');
+    
+    q.options.forEach((opt, i) => {
+        const btn = document.createElement('button');
+        btn.innerText = opt;
+        btn.addEventListener('click', () => {
+            optsDiv.querySelectorAll('button').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+            q.selected = i+1;
+        });
+        optsDiv.appendChild(btn);
+    });
+    
+    qDiv.appendChild(optsDiv);
+    quizContainer.appendChild(qDiv);
+});
+
+// Submit handler
+document.getElementById('submitBtn').addEventListener('click', () => {
+    let score = 0;
+    quizData.forEach(q => {
+        const optsDiv = quizContainer.children[quizData.indexOf(q)].querySelector('.options');
+        q.options.forEach((opt, i) => {
+            const btn = optsDiv.children[i];
+            btn.disabled = true; // disable buttons after submit
+            if(i+1 === q.answer) btn.classList.add('correct');
+            if(q.selected && q.selected !== q.answer && i+1 === q.selected) btn.classList.add('wrong');
+        });
+        if(q.selected === q.answer) score++;
+    });
+    alert(`Your Score: ${score} / ${quizData.length}`);
+    document.getElementById('submitBtn').disabled = true;
+});
+</script>
+</body>
+</html>
